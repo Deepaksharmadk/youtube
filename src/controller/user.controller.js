@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 import { ApiError } from "../utiles/ApiError.js";
 import { ApiResponse } from "../utiles/Apiresponse.js";
 import asyncHandler from "../utiles/asyncHandler.js";
-import usermodal from "../model/user.model.js";
+import User from "../model/user.model.js";
 const registerUser = asyncHandler(async (req, res) => {
   // Destructuring the request body to extract specific user registration information
   // These variables (fullName, email, username, password) will hold the values sent from the client
   const { fullName, email, username, password } = req.body;
-  if (fullName && email && username && password === "") {
+  if (fullName === "") {
     throw new ApiError(400, "all field are required");
   }
-  const exitsedUser = User.findOne({
+  const exitsedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (exitsedUser) {
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     username,
   });
-  const creatUser = await User.findByid(entry._id);
+  const creatUser = await User.findById(entry._id);
   if (!creatUser) {
     throw new ApiError(500, "something went wrong with creating user");
   }
